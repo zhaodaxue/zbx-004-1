@@ -252,6 +252,7 @@ export async function createProcessingTask(input: CreateTaskInput) {
   });
   if (!dilution) throw new Error('稀释液不存在');
   if (dilution.status === DilutionStatus.DISCONTINUED) throw new Error('稀释液已作废');
+  if (dilution.stockBatch.status === BatchStatus.DISCONTINUED) throw new Error('母液已作废，禁止使用该工作液');
   if (isBefore(dilution.expiryDate, today())) throw new Error('稀释液已过期');
   if (dilution.currentVolumeMl < data.consumeMl) {
     throw new Error(

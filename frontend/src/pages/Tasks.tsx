@@ -312,7 +312,7 @@ const Tasks: React.FC = () => {
                 );
               }}
               options={dilutions
-                .filter((d) => d.currentVolumeMl > 0)
+                .filter((d) => d.currentVolumeMl > 0 && d.stockBatch.status !== 'DISCONTINUED')
                 .map((d) => ({
                   label: `${d.stockBatch.formula.name} - 剩${d.currentVolumeMl.toFixed(0)}ml`,
                   value: d.id,

@@ -1,0 +1,64 @@
+// Prisma schema for Darkroom Chemical Management System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Formula {
+  id                    String         @id @default(cuid())
+  name                  String
+  type                  String         // "DEVELOPER" | "FIXER"
+  stockShelfLifeDays    Int
+  standardDilutionRatio Float
+  nominalConcentration  Float
+  batches               StockBatch[]
+  createdAt             DateTime       @default(now())
+}
+
+model StockBatch {
+  id              String         @id @default(cuid())
+  formulaId       String
+  formula         Formula        @relation(fields: [formulaId], references: [id])
+  batchCode       String         @unique
+  openDate        DateTime
+  initialVolumeMl Float
+  currentVolumeMl Float
+  expiryDate      DateTime
+  status          String         @default("ACTIVE") // "ACTIVE" | "DISCONTINUED"
+  dilutions       Dilution[]
+  createdAt       DateTime       @default(now())
+}
+
+model Dilution {
+  id                    String           @id @default(cuid())
+  stockBatchId          String
+  stockBatch            StockBatch       @relation(fields: [stockBatchId], references: [id])
+  stockUsedMl           Float
+  waterAddedMl          Float
+  totalVolumeMl         Float
+  dilutionRatio         Float
+  initialConcentration  Float
+  remainingDaysAtDilution Int
+  initialShelfLifeDays  Int
+  expiryDate            DateTime
+  currentVolumeMl       Float
+  status                String           @default("ACTIVE") // "ACTIVE" | "DISCONTINUED"
+  tasks                 ProcessingTask[]
+  createdAt             DateTime         @default(now())
+}
+
+model ProcessingTask {
+  id         String     @id @default(cuid())
+  taskName   String
+  dilutionId String
+  dilution   Dilution   @relation(fields: [dilutionId], references: [id])
+  consumeMl  Float
+  filmType   String?
+  notes      String?
+  createdAt  DateTime   @default(now())
+}
